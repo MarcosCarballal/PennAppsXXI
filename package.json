@@ -18,8 +18,10 @@
   },
   "homepage": "https://github.com/MarcosCarballal/PennAppsXXI#readme",
   "dependencies": {
+    "@google-cloud/datastore": "^6.1.0",
     "ejs": "^3.1.5",
     "express": "^4.17.1",
+    "express-session": "^1.17.1",
     "socket.io": "^2.3.0"
   }
 }
