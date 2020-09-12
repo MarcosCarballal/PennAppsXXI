@@ -4,6 +4,8 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var port = process.env.PORT || 3000;
 
+playerDict = {}
+
 // express imports
 app.use(express.static('public'));
 // app.use(express.bodyParser());
@@ -20,9 +22,12 @@ app.get('/game', routes.getGame);
 
 // SOCKET
 io.on('connection', function(socket){
+	if(!playerDict[socket.id]){
+		playerDict[socket.id] = "Chad_" + socket.id
+	}
   socket.on('chat message', function(msg){
   	console.log("message:" + msg);
-    io.emit('chat message', msg);
+    io.emit('chat message', playerDict[socket.id] + " guessed:" + msg);
   });
 });
 
