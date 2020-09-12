@@ -1,0 +1,7 @@
+@font-face {
+    font-family: 'ti84';
+    src: url('./fonts/ti84.woff2') format('woff2'),
+      url('./fonts/ti84.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
