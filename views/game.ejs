@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+    <link rel="stylesheet" href="./css/style.css">
+    <head>
+        <script>
+            import './css/style.css';
+        </script>
+        <title>KazooGuesser</title>
+    </head>
+    <body>
+        <div class="header" id="game-header">
+            <h1 style="vertical-align: bottom;">kazuub.io</h1>
+        </div>
+        <div class="page">
+            <div class="game-section" id="players">
+                <div class="game-section-header">
+                    <h2>players</h2>
+                </div>
+            </div>
+            <div class="game-section" id="music">
+                <div class="game-section-header">
+                    <h2>music</h2>
+                </div>
+                <img src="https://e7.pngegg.com/pngimages/439/430/png-clipart-musical-note-eighth-note-miscellaneous-music-symbols.png" alt="" width="400px" height="400px"/>
+                <input type="button" value="PLAY" onclick="play()">
+            </div>
+            <div class="game-section" id="chatbox">
+                <div class="game-section-header">
+                    <h2>chat</h2>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script>
+        function play() {
+        var audio = document.getElementById("audio");
+        audio.play();
+        }
+    </script>
+
+    
+    <audio id="audio" src="https://cdns-preview-d.dzcdn.net/stream/c-deda7fa9316d9e9e880d2c6207e92260-8.mp3"></audio>
+    </html>
