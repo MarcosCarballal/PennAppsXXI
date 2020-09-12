@@ -4,10 +4,16 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const port = process.env.PORT || 3000;
 const session = require('express-session');
+const bodyParser = require('body-parser')
+const cookieParser = require('cookie-parser')
 
 // ADD MIDDLEWARE
 app.use(express.static('public'));
 app.use(session({ secret: 'kazoo' }));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser()); //  Not sure if we need cookies
+
+playerDict = {}
 
 // CONFIGURE GET ROUTES
 const getRoutes = require('./routes/get_routes.js');
@@ -23,9 +29,12 @@ app.post('/postUserInfo', postRoutes.postUserInfo);
 
 // SOCKET 
 io.on('connection', function(socket){
+	if(!playerDict[socket.id]){
+		playerDict[socket.id] = "Chad_" + socket.id
+	}
   socket.on('chat message', function(msg){
   	console.log("message:" + msg);
-    io.emit('chat message', msg);
+    io.emit('chat message', playerDict[socket.id] + " guessed:" + msg);
   });
 });
 

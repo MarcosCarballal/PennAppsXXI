@@ -5,7 +5,12 @@ const getChatTest = (req, res) => {
 }
 
 const getHome = (req, res) => {
-  res.render('home.ejs', {});
+	if (req.session.username){
+		username = req.session.username
+	}else{
+		username = "Guest"
+	}
+  res.render('home.ejs', {'username': username});
 }
 
 const getLobby = (req, res) => {
@@ -20,12 +25,19 @@ const getAbout = (req, res) => {
   res.render('about.ejs', {});
 }
 
+const postUsername = (req, res) => {
+	console.log(req.body.username + " was added as a user")
+	req.session.username = req.body.username
+	res.render('home.ejs', {'username': req.body.username})
+}
+
 const routes = {
   getChatTest:  getChatTest,
   getHome:      getHome,
   getLobby:     getLobby,
   getGame:      getGame,
   getAbout:     getAbout,
+  postUsername: postUsername,
 }
 
 module.exports = routes;

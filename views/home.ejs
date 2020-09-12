@@ -17,7 +17,7 @@
     <!-- TITLE -->
     <div class="row">
       <div class="col-md-12">
-        <div class="jumbotron">
+        <div class="jumbotron" id="title">
           <h1 class="display-3">KAZUUB.IO</h1>
           <p class="lead">a music guessing game</p>
           <hr class="my-2">
@@ -67,6 +67,8 @@
   const ERROR_BAD_LENGTH = `Username must be between ${MIN_NAME_LENGTH} and `
                          + `${MAX_NAME_LENGTH} characters long.`;
 
+  const username = '<%=username%>';
+
   // USERNAME INFO
   $('button#createRoom').click(() => {
     const username = $('input#displayName').val();
@@ -76,6 +78,18 @@
       console.log(ERROR_BAD_LENGTH);
     }
     console.log('create room clicked');
+
+    $.ajax({
+      traditional: true,
+      url: "/postUserInfo",
+      type: 'POST',
+      data: {
+        username: username
+      },
+      success: function (data, textStatus, jqXHR) {
+        console.log("Posted new chat")
+      }
+    });
   });
 
   $('button#joinRoom').click(() => {
@@ -86,6 +100,18 @@
       console.log(ERROR_BAD_LENGTH);
     }
     console.log('join room clicked');
+  });
+
+  const displayWelcome = () => {
+    if (username) {
+      $('#title').prepend(`<h1 class="display-3">Welcome ${username}!</h1>`);
+    } else {
+      $('#title').prepend(`<h1 class="display-3">Welcome!</h1>`);
+    }
+  };
+
+  $(document).ready(() => {
+    displayWelcome();
   });
 
 </script>
