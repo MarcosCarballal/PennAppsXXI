@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="icon" href="./assets/kazoo.png">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script> -->
   <style>
     
     /* .mr-auto {
@@ -50,12 +49,14 @@
             <a class="btn btn-primary btn-lg" href="Jumbo action link" role="button">Button Name</a>
           </p>
         </div>
-      </div>>
+      </div>
     </div>
 
     <div class="row">
       <div class="col-4">
         <!-- USER INFO HERE -->
+        <input type="text" id="username" placeholder="Display name"/>
+        <button id="submitInfo">Send!</button>
       </div>
       <div class="col-8">
         <!-- ABOUT SECTION HERE -->
@@ -65,4 +66,36 @@
   </div>
   
 </body>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>
+  
+  $('button#submitInfo').click(() => {
+    const username = $('input#username').val();
+    console.log(username);
+  });
+  
+  // $('input#username_input').submit((msg) => {
+  //   // msg.preventDefault();
+  //   // $(this)
+  //   console.log('submitted form');
+  //   // if (cont.content) {
+  //   //   socket.emit("send message", JSON.stringify(cont), function () {
+  //   //     $("form#chat #msg_text").val("");
+  //   //   });
+  //   //   $.ajax({
+  //   //     traditional: true,
+  //   //     url: '/postMessage',
+  //   //     type: 'POST',
+  //   //     data: {
+  //   //       chatId: thisChat,
+  //   //       sender: user,
+  //   //       content: $(this).find("#msg_text").val()
+  //   //     },
+  //   //     success: function (data, textStatus, jqXHR) {
+  //   //       console.log("Posted new chat: ", jqXHR.status);
+  //   //     }
+  //   //   });
+  //   // }
+  // });
+</script>
 </html>
