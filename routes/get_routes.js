@@ -4,7 +4,12 @@ const getChatTest = (req, res) => {
 }
 
 const getHome = (req, res) => {
+  var username = null;
+  if (req.session.username) {
+    username = req.session.username;
+  }
   res.render('home.ejs', {
+    username: username,
     errorBadUsername: null,
   });
 }

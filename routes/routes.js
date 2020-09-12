@@ -25,12 +25,6 @@ const getAbout = (req, res) => {
   res.render('about.ejs', {});
 }
 
-const postUsername = (req, res) => {
-	console.log(req.body.username + " was added as a user")
-	req.session.username = req.body.username
-	res.render('home.ejs', {'username': req.body.username})
-}
-
 const routes = {
   getChatTest:  getChatTest,
   getHome:      getHome,
