@@ -16,11 +16,16 @@ const getGame = (req, res) => {
   res.render('game.ejs', {});
 }
 
+const getAbout = (req, res) => {
+  res.render('about.ejs', {});
+}
+
 const routes = {
   getChatTest: getChatTest,
   getHome: getHome,
   getLobby: getLobby,
   getGame: getGame,
+  getAbout: getAbout,
 }
 
 module.exports = routes;
