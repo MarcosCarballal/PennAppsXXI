@@ -1,12 +1,24 @@
-var app = require('express')();
+var express = require('express');
+var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var port = process.env.PORT || 3000;
 
-app.get('/', function(req, res){
-  res.sendFile(__dirname + '/index.html');
-});
+// express imports
+app.use(express.static('public'));
+// app.use(express.bodyParser());
+// app.use(express.cookieParser()); //  Not sure if we need cookies
+// app.use(express.session({ secret: "pass" }));
 
+// importing routes
+var routes = require('./routes/routes.js');
+
+app.get('/', routes.getChatTest);
+app.get('/home', routes.getHome);
+app.get('/lobby', routes.getLobby);
+app.get('/game', routes.getGame);
+
+// SOCKET
 io.on('connection', function(socket){
   socket.on('chat message', function(msg){
   	console.log("message:" + msg);
@@ -14,6 +26,5 @@ io.on('connection', function(socket){
   });
 });
 
-http.listen(port, function(){
-  console.log('listening on *:' + port);
-});
+http.listen(port);
+console.log(`Server running on port ${port}. Open http://localhost:${port}/ in browser!`);

@@ -1,6 +1,11 @@
 
+const getChatTest = (req, res) => {
+  console.log(__dirname);
+  res.render('index.ejs', {});
+}
+
 const getHome = (req, res) => {
-  res.render('main.ejs', {});
+  res.render('home.ejs', {});
 }
 
 const getLobby = (req, res) => {
@@ -12,7 +17,10 @@ const getGame = (req, res) => {
 }
 
 const routes = {
-  
+  getChatTest: getChatTest,
+  getHome: getHome,
+  getLobby: getLobby,
+  getGame: getGame,
 }
 
 module.exports = routes;
