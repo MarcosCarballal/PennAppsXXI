@@ -6,8 +6,15 @@
     font-style: normal;
 }
 
+/* @media (min-width: 1200px) {
+  .container {
+    width: 1000px;
+  }
+} */
+
 .header {
   height: 100px;
+  /* width: 100vw; */
   background-color: rgb(100, 100, 253);
   color: white;
   border-radius: 10px;
@@ -17,14 +24,14 @@
 }
 
 .page {
-  display: inline-flex;
+  display: flex;
   flex-direction: row;
   justify-content: center;
-  margin: 20px;
+  /* margin: 20px; */
 }
 
 .game-section {
-  min-width: 200px;
+  /* min-width: 200px; */
   min-height: 200px;
   margin: 20px;
   padding: 10px;
@@ -32,9 +39,20 @@
   border: 3px solid rgb(100, 100, 253);
   display: inline-flex;
   flex-direction: column;
+  box-shadow: 0 8px 4px 0 rgba(0,0,0,0.2);
 }
 
+/* #players {
+}
+
+#music {
+}
+
+#chat {
+} */
+
 .game-section-header {
+  padding: 10px;
   background-color: rgb(100, 100, 253);
   color: white;
   border-radius: 10px;
