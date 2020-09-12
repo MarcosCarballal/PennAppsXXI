@@ -41,6 +41,9 @@
     <div class="row">
       <div class="col-md-12">
         <div class="jumbotron">
+          <%if (username) { %>
+          <h1 class="display-3">Welcome <%=username%>!</h1>
+          <% } %>
           <h1 class="display-3">KAZUUB.IO</h1>
           <p class="lead">a music guessing game</p>
           <hr class="my-2">
@@ -72,6 +75,19 @@
   $('button#submitInfo').click(() => {
     const username = $('input#username').val();
     console.log(username);
+    
+    $.ajax({
+      traditional: true,
+      url: "/postUsername",
+      type: 'POST',
+      data: {
+        username: username
+      },
+      success: function (data, textStatus, jqXHR){
+        console.log("Posted new chat")
+      }
+    });
+
   });
   
   // $('input#username_input').submit((msg) => {
