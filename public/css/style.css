@@ -32,7 +32,7 @@
 
 .game-section {
   /* min-width: 200px; */
-  min-height: 200px;
+  min-height: 50vh;
   margin: 20px;
   padding: 10px;
   border-radius: 10px;
@@ -42,15 +42,6 @@
   box-shadow: 0 8px 4px 0 rgba(0,0,0,0.2);
 }
 
-/* #players {
-}
-
-#music {
-}
-
-#chat {
-} */
-
 .game-section-header {
   padding: 10px;
   background-color: rgb(100, 100, 253);
@@ -59,4 +50,45 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.text-entry {
+  width: 100%;
+  position: absolute;
+  margin: 10px;
+  bottom: 0;
+}
+
+.player-card {
+  min-height: 50px;
+  padding: 5px;
+  border-radius: 50px;
+  border: 3px solid rgb(100, 100, 253);
+  margin: 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  /* align-items: left; */
+  color: black;
+}
+
+#player-avatar {
+  alt: "";
+  width: 80px;
+  height: 80px;
+}
+
+#player-name {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+
+#player-score {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  margin-right: 0;
+  padding: 10px;
 }

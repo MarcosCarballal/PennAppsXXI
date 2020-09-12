@@ -38,7 +38,19 @@ io.on('connection', function(socket){
   });
 });
 
-// LISTEN ON PORT
+//GAME LOOP
+function startGame() {
+  const numRounds = 3;
+  var round = 0;
+  while (round < numRounds) {
+    //getSong();
+    //playSong();
+    //wait for players to answer or time to run out
+    //increment scores
+    round++;
+  }
+}
+
 http.listen(port);
 console.log(`Server running on port ${port}. Open http://localhost:${port}/ in browser!`);
 
