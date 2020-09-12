@@ -6,30 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="icon" href="./assets/kazoo.png">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <style>
-    
-    /* .mr-auto {
-      margin-right: 0 !important;
-    }
-    
-    .card {
-      padding-left: 5px;
-      padding-right: 10px;
-      margin-top: 10px;
-      margin-bottom: 10px;
-    }
-    
-    .panel {
-      border-color: grey;
-      border-width: 1px;
-      text-align: center;
-    }
-
-    .post-card {
-      text-align: left;
-    } */
-    
-  </style>
+  <style></style>
   <script></script>
 </head>
 <body>
@@ -53,12 +30,28 @@
     </div>
 
     <div class="row">
-      <div class="col-4">
+      <div class="col-6">
         <!-- USER INFO HERE -->
-        <input type="text" id="username" placeholder="Display name"/>
-        <button id="submitInfo">Send!</button>
+        <div class="form-group">
+          <!-- <label for="exampleInputEmail1">Display Name</label> -->
+          <input type="text" class="form-control" id="displayName" placeholder="Display name">
+          <small id="emailHelp" class="form-text text-muted">Between 3 and 20 characters</small>
+        </div>
+        <div class="row" style="margin-bottom: 15px;">
+          <div class="col-12">
+            <button class="btn btn-primary btn-block" id="createRoom">Create Room</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6">
+            <button class="btn btn-primary btn-block" id="joinRoom">Join Room</button>
+          </div>
+          <div class="col-6">
+            <input type="text" class="form-control" placeholder="Room code">
+          </div>
+        </div>
       </div>
-      <div class="col-8">
+      <div class="col-6">
         <!-- ABOUT SECTION HERE -->
       </div>
     </div>
@@ -69,33 +62,31 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>
   
-  $('button#submitInfo').click(() => {
-    const username = $('input#username').val();
-    console.log(username);
+  const MIN_NAME_LENGTH = 3;
+  const MAX_NAME_LENGTH = 20;
+  const ERROR_BAD_LENGTH = `Username must be between ${MIN_NAME_LENGTH} and `
+                         + `${MAX_NAME_LENGTH} characters long.`;
+
+  // USERNAME INFO
+  $('button#createRoom').click(() => {
+    const username = $('input#displayName').val();
+    if (!username || 
+        username.length < MIN_NAME_LENGTH || 
+        username.length > MAX_NAME_LENGTH) {
+      console.log(ERROR_BAD_LENGTH);
+    }
+    console.log('create room clicked');
   });
-  
-  // $('input#username_input').submit((msg) => {
-  //   // msg.preventDefault();
-  //   // $(this)
-  //   console.log('submitted form');
-  //   // if (cont.content) {
-  //   //   socket.emit("send message", JSON.stringify(cont), function () {
-  //   //     $("form#chat #msg_text").val("");
-  //   //   });
-  //   //   $.ajax({
-  //   //     traditional: true,
-  //   //     url: '/postMessage',
-  //   //     type: 'POST',
-  //   //     data: {
-  //   //       chatId: thisChat,
-  //   //       sender: user,
-  //   //       content: $(this).find("#msg_text").val()
-  //   //     },
-  //   //     success: function (data, textStatus, jqXHR) {
-  //   //       console.log("Posted new chat: ", jqXHR.status);
-  //   //     }
-  //   //   });
-  //   // }
-  // });
+
+  $('button#joinRoom').click(() => {
+    const username = $('input#displayName').val();
+    if (!username || 
+        username.length < MIN_NAME_LENGTH || 
+        username.length > MAX_NAME_LENGTH) {
+      console.log(ERROR_BAD_LENGTH);
+    }
+    console.log('join room clicked');
+  });
+
 </script>
 </html>
