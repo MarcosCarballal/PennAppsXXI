@@ -16,5 +16,9 @@
   "bugs": {
     "url": "https://github.com/MarcosCarballal/PennAppsXXI/issues"
   },
-  "homepage": "https://github.com/MarcosCarballal/PennAppsXXI#readme"
+  "homepage": "https://github.com/MarcosCarballal/PennAppsXXI#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^2.3.0"
+  }
 }
