@@ -21,11 +21,11 @@ const getAbout = (req, res) => {
 }
 
 const routes = {
-  getChatTest: getChatTest,
-  getHome: getHome,
-  getLobby: getLobby,
-  getGame: getGame,
-  getAbout: getAbout,
+  getChatTest:  getChatTest,
+  getHome:      getHome,
+  getLobby:     getLobby,
+  getGame:      getGame,
+  getAbout:     getAbout,
 }
 
 module.exports = routes;
