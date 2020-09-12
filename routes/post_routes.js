@@ -1,12 +1,9 @@
 
-
-
 const postUserInfo = (req, res) => {
-  
-  // if (!req.session) {
-  //   req.session.displayName = 
-  // }
-};
+	console.log(req.body.username + " was added as a user")
+	req.session.username = req.body.username
+	res.render('home.ejs', {'username': req.body.username})
+}
 
 const routes = {
   postUserInfo: postUserInfo,
