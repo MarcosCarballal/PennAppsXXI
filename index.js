@@ -1,34 +1,33 @@
-var session = require('express-session')
-var express = require('express');
-var app = express();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
-var port = process.env.PORT || 3000;
+const express = require('express');
+const app = express();
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
+const port = process.env.PORT || 3000;
+const session = require('express-session');
+const bodyParser = require('body-parser')
+const cookieParser = require('cookie-parser')
+
+// ADD MIDDLEWARE
+app.use(express.static('public'));
+app.use(session({ secret: 'kazoo' }));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser()); //  Not sure if we need cookies
 
 playerDict = {}
 
-// express imports
-app.use(session({
-	secret: 'secret'
-}))
-app.use(express.static('public'));
-const bodyParser = require('body-parser')
-const cookieParser = require('cookie-parser')
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser()); //  Not sure if we need cookies
-// app.use(express.session({ secret: "pass" }));
+// CONFIGURE GET ROUTES
+const getRoutes = require('./routes/get_routes.js');
+app.get('/',      getRoutes.getChatTest);
+app.get('/home',  getRoutes.getHome);
+app.get('/lobby', getRoutes.getLobby);
+app.get('/game',  getRoutes.getGame);
+app.get('/about', getRoutes.getAbout);
 
-// importing routes
-var routes = require('./routes/routes.js');
+// CONFIGURE POST ROUTES
+const postRoutes = require('./routes/post_routes.js');
+app.post('/postUserInfo', postRoutes.postUserInfo);
 
-app.get('/',      routes.getChatTest);
-app.get('/home',  routes.getHome);
-app.get('/lobby', routes.getLobby);
-app.get('/game',  routes.getGame);
-app.get('/about', routes.getAbout);
-app.use('/postUsername', routes.postUsername)
-
-// SOCKET
+// SOCKET 
 io.on('connection', function(socket){
 	if(!playerDict[socket.id]){
 		playerDict[socket.id] = "Chad_" + socket.id
@@ -39,5 +38,10 @@ io.on('connection', function(socket){
   });
 });
 
+// LISTEN ON PORT
 http.listen(port);
 console.log(`Server running on port ${port}. Open http://localhost:${port}/ in browser!`);
+
+module.exports = {
+  io: io,
+};
