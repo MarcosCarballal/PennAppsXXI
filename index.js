@@ -13,10 +13,11 @@ app.use(express.static('public'));
 // importing routes
 var routes = require('./routes/routes.js');
 
-app.get('/', routes.getChatTest);
-app.get('/home', routes.getHome);
+app.get('/',      routes.getChatTest);
+app.get('/home',  routes.getHome);
 app.get('/lobby', routes.getLobby);
-app.get('/game', routes.getGame);
+app.get('/game',  routes.getGame);
+app.get('/about', routes.getAbout);
 
 // SOCKET
 io.on('connection', function(socket){
