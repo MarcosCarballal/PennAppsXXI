@@ -68,7 +68,6 @@
   display: flex;
   flex-direction: row;
   justify-content: left;
-  /* align-items: left; */
   color: black;
 }
 
@@ -91,4 +90,11 @@
   margin-left: auto;
   margin-right: 0;
   padding: 10px;
+}
+
+.lobby-background {
+  height: max-content;
+  background-color: rgb(100, 100, 253);
+  color: white;
+  border-radius: 20px;
 }

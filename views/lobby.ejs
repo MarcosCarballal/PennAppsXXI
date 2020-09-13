@@ -6,40 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="icon" href="./assets/kazoo.png">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script> -->
-  <style>
-    
-    /* .mr-auto {
-      margin-right: 0 !important;
-    }
-    
-    .card {
-      padding-left: 5px;
-      padding-right: 10px;
-      margin-top: 10px;
-      margin-bottom: 10px;
-    }
-    
-    .panel {
-      border-color: grey;
-      border-width: 1px;
-      text-align: center;
-    }
-
-    .post-card {
-      text-align: left;
-    } */
-    
-  </style>
-  <script>
-    const socket = io();
-
-    socket.on('update lobby members')
-
-    $('document').ready(() => {
-      // on page load
-    });
-  </script>
+  <link rel="stylesheet" href="./css/style.css" />
 </head>
 <body>
   
@@ -49,16 +16,18 @@
     <!-- TITLE -->
     <div class="row">
       <div class="col-md-12">
-        <div class="jumbotron">
+        <div class="jumbotron lobby-background">
           <h1 class="display-3">KAZUUB.IO LOBBY</h1>
           <p class="lead">a music guessing game</p>
           <hr class="my-2">
           <p>PENNAPPS XXI</p>
           <p class="lead">
-            <a class="btn btn-primary btn-lg" href="Jumbo action link" role="button">Button Name</a>
+            <button role="button" id="start-game">Start Game</button>
+            <!-- <a class="btn btn-primary btn-lg" role="button" id="start-game">Start Game</a> -->
           </p>
         </div>
-      </div>>
+        <ul id="players" style="list-style-type: none;"></ul>
+      </div>
     </div>
 
     <div class="row">
@@ -73,4 +42,63 @@
   </div>
   
 </body>
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script>
+  const socket = io();
+
+  var players = [
+      { name: "mac"},
+      { name: "marcos"},
+      { name: "riley"},
+      { name: "efe"},
+    ];
+
+  socket.on('playerJoined', function(newPlayers) {
+    players = newPlayers;
+    renderPlayerCards();
+  });
+
+  socket.on('playerLeft', function(player) {
+
+  });
+
+  function renderPlayerCards() {
+    players.forEach(player => {
+      var playerCard = document.createElement("div");
+      playerCard.className = "player-card";
+
+      var playerAvatar = document.createElement("img");
+      playerAvatar.id = "player-avatar";
+      playerAvatar.src = "https://icon-library.com/images/male-avatar-icon/male-avatar-icon-14.jpg";
+
+      var playerName = document.createElement("h3");
+      playerName.innerHTML = player.name;
+      playerName.id = "player-name";
+      playerCard.append(playerAvatar);
+      playerCard.append(playerName);
+      $("#players").append(playerCard);
+    });
+  }
+
+  $('#start-game').click(() => {
+    socket.emit('startGame');
+  });
+
+  socket.on('gameStarted', function(game_id) {
+    console.log('game started!');
+    $.ajax({
+      url: "/game",
+      data: { },
+      success: function(xmlHttp) {
+        window.location = "/game/" + game_id;
+      }
+    });
+  });
+
+  $('document').ready(() => {
+    renderPlayerCards();
+  });
+
+</script>
 </html>
