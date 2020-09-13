@@ -78,20 +78,12 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>
   
+  const username = '<%=username%>';
+
   var socket = io()
 
   // CREATE ROOM
   $('button#createRoom').click(() => {
-
-    const username = $('input#displayName').val();
-    if (!username || 
-        username.length < MIN_NAME_LENGTH || 
-        username.length > MAX_NAME_LENGTH) {
-      console.log(ERROR_BAD_LENGTH);
-    }
-
-    console.log('create room clicked');
-
     $.ajax({
       traditional: true,
       url: "/postUserInfo",
@@ -109,11 +101,6 @@
   // JOIN ROOM
   $('button#joinRoom').click(() => {
     const username = $('input#displayName').val();
-    if (!username || 
-        username.length < MIN_NAME_LENGTH || 
-        username.length > MAX_NAME_LENGTH) {
-      console.log(ERROR_BAD_LENGTH);
-    }
     console.log('join room clicked');
     $.ajax({
         traditional: true,
@@ -149,7 +136,6 @@
 
   // PRE-FILL USERNAME FIELD FROM SESSION
   const populateUsernameField = () => {
-    const username = '<%=username%>';
     $('input#displayName').val(username);
   };
 

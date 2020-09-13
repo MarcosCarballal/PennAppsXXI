@@ -57,22 +57,51 @@
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
   <script>
 
-    $(function () {
-      var socket = io();
-      $("form").submit(function (e) {
-        e.preventDefault(); // prevents page reloading
-        socket.emit("chat message", $("#message_input").val());
-        $("#message_input").val("");
-        return false;
-      });
-      socket.on("chat message", function (msg) {
-        $("#messages").append($("<li>").text(msg));
-      });
+    // Page state
+    const roomId = '<%=roomId%>';
+    const username = '<%=username%>';
+    const userId = '<%=userId%>';
+    const userInfo = {
+      username: username,
+      userId: userId,
+    };
+
+    // Socket setup
+    const socket = io();
+
+    socket.on('receive', (data) => {
+      console.log(data);
+      const chatText = `<b>${data.userInfo.username}</b>: ${data.message}`;
+      $("#messages").append($("<li>").html(chatText));
     });
 
-    $('form#sendChat').submit(() => {
-      const message = $('#messageInput').val();
+    const setupSockets = () => {
+      socket.emit('joinRoom', {
+        userInfo: userInfo,
+        roomId: roomId,
+      });
+    };
 
+    $('form#sendChat').submit((e) => {
+      console.log('chat submitted');
+      e.preventDefault(); // Prevents page reloading
+      const message = $('#messageInput').val();
+      if (!message) { return; }
+      
+      // Send message to room
+      socket.emit('send', {
+        userInfo: userInfo,
+        roomId: roomId,
+        message: message,
+      });
+
+      console.log({
+        userInfo: userInfo,
+        roomId: roomId,
+        message: message,
+      });
+
+      $('#messageInput').val('');
     });
 
     function sortByScore(a, b) {
@@ -120,5 +149,10 @@
       var song = document.getElementById("song");
       song.play();
     }
+
+    $('document').ready(() => {
+      setupSockets();
+    });
+
   </script>
 </html>

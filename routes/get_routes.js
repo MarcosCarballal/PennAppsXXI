@@ -29,7 +29,11 @@ const getLobby = (req, res) => {
 }
 
 const getGame = (req, res) => {
-  res.render('game.ejs', {});
+  res.render('game.ejs', {
+    username: "Riley",
+    userId: "rileys_id",
+    roomId: "322",
+  });
 }
 
 const getAbout = (req, res) => {

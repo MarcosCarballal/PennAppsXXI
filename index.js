@@ -59,9 +59,9 @@ io.on('connection', (client) => {
   client.on('joinRoom', (data) => {
 
     // Update room state; dont double users
-    var room = roomInfo[data.roomId];
-    var user = data.userInfo;
-    room.userIds.push(user.id);
+    // var room = roomInfo[data.roomId];
+    // var user = data.userInfo;
+    // room.userIds.push(user.id);
     
     // todo
     // const userId = data.userInfo.userId;
@@ -70,7 +70,7 @@ io.on('connection', (client) => {
     // if (!userScores[userId]) { userScores[userId] = 0; }
 
     // subscribe to the room
-    client.join(roomId);
+    client.join(data.roomId);
   });
 
   client.on('startGame', function(game_id){
@@ -80,8 +80,9 @@ io.on('connection', (client) => {
   // data = { roomId: ..., userInfo: {...}, message: ... }
   client.on('send', (data) => {
     // todo: check if correct
+    console.log(data);
     io.to(data.roomId).emit('receive', {
-      username: data.userInfo.username,
+      userInfo: data.userInfo,
       message: data.message,
     });
   });
