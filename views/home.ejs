@@ -6,7 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="icon" href="./assets/kazoo.png">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <style></style>
+  <style>
+
+  </style>
   <script></script>
 </head>
 <body>
@@ -33,9 +35,11 @@
       <div class="col-6">
         <!-- USER INFO HERE -->
         <div class="form-group">
-          <!-- <label for="exampleInputEmail1">Display Name</label> -->
           <input type="text" class="form-control" id="displayName" placeholder="Display name">
           <small id="emailHelp" class="form-text text-muted">Between 3 and 20 characters</small>
+          <div id="errorBadUsername" style="margin-top: 15px; margin-bottom: 15px;">
+            <!-- ERROR BAD USERNAME -->
+          </div>
         </div>
         <div class="row" style="margin-bottom: 15px;">
           <div class="col-12">
@@ -48,6 +52,12 @@
           </div>
           <div class="col-6">
             <input type="text" class="form-control" placeholder="Room code">
+            <!-- <div id="errorNoRoomId" style="margin-top: 15px; margin-bottom: 15px;"> -->
+              <!-- ERROR NO ROOM ID -->
+            <!-- </div> -->
+            <strong id="errorNoRoomId" style="margin-right: 15px; color: red;">
+              <!-- ERROR SIGNING IN MESSAGE -->
+            </strong>
           </div>
         </div>
       </div>
@@ -61,47 +71,29 @@
 </body>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>
-  
-  const MIN_NAME_LENGTH = 3;
-  const MAX_NAME_LENGTH = 20;
-  const ERROR_BAD_LENGTH = `Username must be between ${MIN_NAME_LENGTH} and `
-                         + `${MAX_NAME_LENGTH} characters long.`;
 
-  const username = '<%=username%>';
-
-  // USERNAME INFO
+  // CREATE ROOM
   $('button#createRoom').click(() => {
-    const username = $('input#displayName').val();
-    if (!username || 
-        username.length < MIN_NAME_LENGTH || 
-        username.length > MAX_NAME_LENGTH) {
-      console.log(ERROR_BAD_LENGTH);
-    }
-    console.log('create room clicked');
-
-    $.ajax({
-      traditional: true,
-      url: "/postUserInfo",
-      type: 'POST',
-      data: {
-        username: username
-      },
-      success: function (data, textStatus, jqXHR) {
-        console.log("Posted new chat")
-      }
-    });
+    postUserInfoFromInput();
+    location.href = '/lobby';
   });
 
+  // JOIN ROOM
   $('button#joinRoom').click(() => {
-    const username = $('input#displayName').val();
-    if (!username || 
-        username.length < MIN_NAME_LENGTH || 
-        username.length > MAX_NAME_LENGTH) {
-      console.log(ERROR_BAD_LENGTH);
-    }
-    console.log('join room clicked');
+    postUserInfoFromInput();
+    $.get('/lobby');
   });
 
+  const postUserInfoFromInput = () => {
+    const username = $('input#displayName').val();
+    $.post(
+      '/postUserInfo',
+      { username: username },
+      () => { console.log('User info saved!'); }
+    );
+  }
+
+  // Maybe remove this -R
   const displayWelcome = () => {
     if (username) {
       $('#title').prepend(`<h1 class="display-3">Welcome ${username}!</h1>`);
@@ -110,8 +102,33 @@
     }
   };
 
+  // PRE-FILL USERNAME FIELD FROM SESSION
+  const populateUsernameField = () => {
+    const username = '<%=username%>';
+    $('input#displayName').val(username);
+  };
+
+  // DISPLAY ERRORS
+  const displayErrorMessages = () => {
+    const errorBadUsername = '<%=errorBadUsername%>';
+    if (errorBadUsername) { 
+      $('#errorBadUsername').html(`
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <!-- strong>Error signing in: </strong --><span>${errorSigningUp}</span>
+        </div>
+      `);
+    }
+
+    const errorNoRoomId = '<%=errorNoRoomId%>';
+    if (errorNoRoomId) {
+      $('#errorNoRoomId').html(errorNoRoomId);
+    }
+  };
+
   $(document).ready(() => {
     displayWelcome();
+    populateUsernameField();
+    displayErrorMessages();
   });
 
 </script>
