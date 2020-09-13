@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <style></style>
   <script></script>
+  <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
   
@@ -59,9 +60,14 @@
   </div>
   
 </body>
+
+<script>
+
+
+</script>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>
-  
+  var socket = io()
   const MIN_NAME_LENGTH = 3;
   const MAX_NAME_LENGTH = 20;
   const ERROR_BAD_LENGTH = `Username must be between ${MIN_NAME_LENGTH} and `
@@ -71,12 +77,14 @@
 
   // USERNAME INFO
   $('button#createRoom').click(() => {
+
     const username = $('input#displayName').val();
     if (!username || 
         username.length < MIN_NAME_LENGTH || 
         username.length > MAX_NAME_LENGTH) {
       console.log(ERROR_BAD_LENGTH);
     }
+
     console.log('create room clicked');
 
     $.ajax({
@@ -88,6 +96,7 @@
       },
       success: function (data, textStatus, jqXHR) {
         console.log("Posted new chat")
+        socket.emit("createRoom")
       }
     });
   });
@@ -113,6 +122,12 @@
   $(document).ready(() => {
     displayWelcome();
   });
+
+  $(function(){
+    socket.on('game_id',function(game_id){
+      window.location = "/lobby/" + game_id
+    });
+  })
 
 </script>
 </html>
