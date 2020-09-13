@@ -30,6 +30,13 @@ app.post('/postCreateRoom', postRoutes.postCreateRoom);
 // ROOM STATE
 roomIds = [];
 roomInfo = {};
+socketInfo = {};
+// userIds
+// userInfo
+// timeCreated
+// usersBySocketIds
+// ...
+// ...
 
 const ROOM_TTL = 3 * 60 * 60 * 1000;      // 3 hours
 const ROOM_DELETER_INTERVAL = 60 * 1000;  // 1 minute
@@ -58,19 +65,30 @@ io.on('connection', (client) => {
   // data = { userInfo: {...}, roomId: ... }
   client.on('joinRoom', (data) => {
 
-    // Update room state; dont double users
-    // var room = roomInfo[data.roomId];
-    // var user = data.userInfo;
-    // room.userIds.push(user.id);
+    // Update room state
+    var roomId = data.roomId;
+    var room = roomInfo[roomId];
+    var userIds = room.userIds;
+    var userInfo = room.userInfo;
+    var userScores = room.userScores;
+    var userId = userInfo.userId;
+
+    if (!userIds.includes(userId)) { userIds.push(userId); }
+    if (!userInfo[userId]) { userInfo[userId] = userInfo; }
+    if (!userScores[userId]) { userScores[userId] = 0; }
     
-    // todo
-    // const userId = data.userInfo.userId;
-    // if (!userIds.includes(userId)) { userIds.push(userId); }
-    // if (!userInfo[userId]) { userInfo[userId] = userInfo; }
-    // if (!userScores[userId]) { userScores[userId] = 0; }
+    socketInfo[client.id] = {
+      userId: userId,
+      roomId: roomId,
+    };
 
     // subscribe to the room
-    client.join(data.roomId);
+    client.join(roomId);
+    client.to(roomId).emit('userJoined', {
+      username: username,
+      score: userScores[userId],
+      // TODO: add avatar
+    });
   });
 
   client.on('startGame', function(game_id){
@@ -88,7 +106,9 @@ io.on('connection', (client) => {
   });
   
   client.on('disconnect', () => {
-  	
+    var ids = socketInfo[client.id]
+    client.to(ids.roomId).emit('userLeft', { userId: userId });
+    delete socketInfo[client.id];
   });
 
 });
