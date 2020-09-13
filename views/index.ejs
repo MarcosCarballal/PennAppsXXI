@@ -19,7 +19,7 @@
     <form action="">
       <input id="message_input" autocomplete="off" /><button>Send</button>
     </form>
-  <script src="/socket.io/socket.io.js"></script>
+
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
   <script>
   $(function () {
@@ -30,7 +30,7 @@
       $('#message_input').val('');
       return false;
     });
-    socket.on('chat message', function(msg){
+    socket.on('chat message', function(id){
       $('#messages').append($('<li>').text(msg));
     });
   });
