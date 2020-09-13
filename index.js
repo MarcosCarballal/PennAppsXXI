@@ -108,7 +108,26 @@ io.on('connection', (client) => {
   client.on('disconnect', () => {
     var ids = socketInfo[client.id]
     if (!ids) { return; }
-    io.to(ids.roomId).emit('userLeft', { userId: ids.userId });
+
+    // Remove user id from list
+    console.log('userIds: ' + roomInfo[ids.roomId].userIds);
+    // console.log('userIds: ' + type(roomInfo[ids.roomId].userIds));
+    
+    var tempUserIds = [];
+    roomInfo[ids.roomId].userIds.forEach((id) => {
+      if (id != ids.userId) {
+        tempUserIds.push(id);
+      }
+    });
+    roomInfo[ids.roomId].userIds = tempUserIds;
+
+    var userInfos = [];
+    console.log(roomInfo[ids.roomId]);
+    roomInfo[ids.roomId].userIds.forEach((id) => {
+        userInfos.push(roomInfo[ids.roomId].userInfos[id]);
+    });
+
+    io.to(ids.roomId).emit('userLeft', userInfos);
     delete socketInfo[client.id];
   });
 
