@@ -89,6 +89,23 @@
       }
       socket.on('userJoined', refreshPlayers);
       socket.on('userLeft', refreshPlayers);
+      socket.on('roundStart', (data) => {
+        console.log('roundStart socket called');
+        const songId = data.songId;
+        const roundLength = data.roundLength;
+        const roundNumber = data.roundNumber;
+        // TODO
+      });
+      socket.on('wordBlanks', (data) => {
+        console.log('wordBlanks socket called');
+        const songHint = data.songHint;
+        // TODO
+      });
+      socket.on('updateScores', (data) => refreshPlayers);
+      socket.on('endGame', () => {
+        console.log('endGame socket called');
+        // TODO
+      });
     };
 
     $('form#sendChat').submit((e) => {
