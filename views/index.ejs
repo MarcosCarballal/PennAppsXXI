@@ -31,7 +31,6 @@
       return false;
     });
     socket.on('chat message', function(id){
-      window.location("/game/")
       $('#messages').append($('<li>').text(msg));
     });
   });

@@ -45,15 +45,35 @@ io.on('connection', function(socket){
   	// Send back Game ID
   	// Emit back to client the page to navigate to
   	game_id = roomCounter
-  	socket.join(game_id)
+  	socket.join(game_id) // Creates room and joins maker's socket
   	roomCounter = roomCounter + 1
   	console.log("Created room with id " + game_id)
+  	console.log("Socket with id" + socket.id + " joined the room with ID " + game_id)
+  	console.log(io.sockets.adapter.rooms)
+  	console.log("Room keys vvvvvvvvvv")
+  	console.log(Object.keys(io.sockets.adapter.rooms))
   	io.to(socket.id).emit('game_id',game_id)// respond only to sender
   });
-  socket.on('joinGame', function(game_id){
+  socket.on('joinRoom', function(game_id){
   	// Add socket to room
   	// Emit back to client the page to navigate to
   	// Bind the socket_id to the user registered under cookies.
+  	console.log(io.sockets.adapter.rooms)
+  	console.log("Room keys vvvvvvvvvv")
+  	console.log(Object.keys(io.sockets.adapter.rooms))
+
+    socket.join(game_id)
+		io.to(socket.id).emit('game_id', game_id)
+		console.log(io.sockets.adapter.rooms)
+
+  	// if (Object.keys(io.sockets.adapter.rooms).includes(game_id)){
+	  //   socket.join(game_id)
+			// io.to(socket.id).emit('game_id', game_id)
+			// console.log(io.sockets.adapter.rooms)
+  	// }
+  	// else{
+  	// 	io.to(socket.id).emit('invalid_game_id', true)  		
+  	// }
   })
   socket.on('startGame', function(game_id){
   	console.log("Staring the game with game_id:" + str(game_id))

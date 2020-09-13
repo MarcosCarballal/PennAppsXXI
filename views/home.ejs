@@ -109,6 +109,18 @@
       console.log(ERROR_BAD_LENGTH);
     }
     console.log('join room clicked');
+    $.ajax({
+        traditional: true,
+        url: "/postUserInfo",
+        type: 'POST',
+        data: {
+        username: username
+      },
+      success: function (data, textStatus, jqXHR) {
+        console.log("Posted new chat")
+        socket.emit("joinRoom")
+      }
+    });
   });
 
   const displayWelcome = () => {
@@ -125,9 +137,15 @@
 
   $(function(){
     socket.on('game_id',function(game_id){
-      window.location = "/lobby/" + game_id
+      window.location = "/lobby/" // TODO: Go to specific
     });
   })
+
+  $(function(){
+    socket.on('invalid_game_id',function(game_id){
+      window.location = "/blah/" // TODO: Fix
+    });
+  })  
 
 </script>
 </html>
