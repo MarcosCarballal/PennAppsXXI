@@ -48,7 +48,7 @@
             <button class="btn btn-primary btn-block" id="joinRoom">Join Room</button>
           </div>
           <div class="col-6">
-            <input type="text" class="form-control" placeholder="Room code">
+            <input type="text" class="form-control" placeholder="Room code" id="roomCodeInput">
             <!-- <div id="errorNoRoomId" style="margin-top: 15px; margin-bottom: 15px;"> -->
               <!-- ERROR NO ROOM ID -->
             <!-- </div> -->
@@ -84,6 +84,10 @@
   // Socket
   socket.on('roomCreated', (roomId) => {
     console.log('room Created: ' + roomId);
+    goToLobby(username, userId, roomId);
+  });
+
+  const goToLobby = (username, userId, roomId) => {
     const fakeForm = `
       <form hidden id="fakeForm" action="/postCreateRoom" method="post">
         <input name="username" value="${username}"></input>
@@ -91,10 +95,9 @@
         <input name="roomId" value="${roomId}"></input>
       </form>
     `;
-
     $('body').append(fakeForm);
     $('#fakeForm').submit();
-  });
+  };
 
   // CREATE ROOM
   $('button#createRoom').click(() => {
@@ -128,17 +131,27 @@
   // JOIN ROOM
   $('button#joinRoom').click(() => {
     const username = $('input#displayName').val();
-    console.log('join room clicked');
+    console.log('joinRoom');
     $.ajax({
-        traditional: true,
-        url: "/postUserInfo",
-        type: 'POST',
-        data: {
-        username: username
-      },
-      success: function (data, textStatus, jqXHR) {
-        console.log("Posted new chat")
-        socket.emit("joinRoom")
+      traditional: true,
+      url: "/postUserInfo",
+      type: 'POST',
+      data: { username: username },
+      success: (data, textStatus, jqXHR) => {
+        if (textStatus == 'success') {
+          userId = data.userId;
+          console.log('success: ' + userId);
+          const roomId = $('#roomCodeInput').val();
+          // TODO VERIFY ROOM EXISTS server and client!
+          goToLobby(username, userId, roomId);
+        } else {
+          const MIN_USERNAME_LENGTH = 3;
+          const MAX_USERNAME_LENGTH = 20;
+          const ERROR_BAD_USERNAME = 
+              `Username must be between ${MIN_USERNAME_LENGTH} and `
+            + `${MAX_USERNAME_LENGTH} characters long!`;
+          displayErrorMessages();
+        }
       }
     });
   });
@@ -186,10 +199,6 @@
     populateUsernameField();
     displayErrorMessages();
   });
-
-  $(function(){
-    
-  })
 
   $(function(){
     socket.on('invalid_game_id',function(game_id){

@@ -54,7 +54,7 @@ io.on('connection', (client) => {
       timeCreated: Date.now(),
       hasStarted: false,
       userIds: [],
-      userScores: {},
+      userInfos: {},
     };
     roomInfo[id] = room;
     roomIds.push(id);
@@ -65,30 +65,30 @@ io.on('connection', (client) => {
   // data = { userInfo: {...}, roomId: ... }
   client.on('joinRoom', (data) => {
 
-    // Update room state
     var roomId = data.roomId;
+    var newUserId = data.userInfo.userId;
+    var newUserInfo = data.userInfo;
+    newUserInfo['score'] = 0;
+    
     var room = roomInfo[roomId];
-    var userIds = room.userIds;
-    var userInfo = room.userInfo;
-    var userScores = room.userScores;
-    var userId = userInfo.userId;
 
-    if (!userIds.includes(userId)) { userIds.push(userId); }
-    if (!userInfo[userId]) { userInfo[userId] = userInfo; }
-    if (!userScores[userId]) { userScores[userId] = 0; }
+    // Update room state // CHECK IF USERNAME CHANGED TODO
+    if (!room.userIds.includes(newUserId)) { room.userIds.push(newUserId); }
+    if (!room.userInfos[newUserId]) { room.userInfos[newUserId] = newUserInfo; }
     
     socketInfo[client.id] = {
-      userId: userId,
+      userId: newUserId,
       roomId: roomId,
     };
 
-    // subscribe to the room
-    client.join(roomId);
-    client.to(roomId).emit('userJoined', {
-      username: username,
-      score: userScores[userId],
-      // TODO: add avatar
+    var userInfos = [];
+    roomInfo[roomId].userIds.forEach((id) => {
+      userInfos.push(roomInfo[roomId].userInfos[id]);
     });
+
+    // Subscribe to the room and tell the others
+    client.join(roomId);
+    io.to(roomId).emit('userJoined', userInfos);
   });
 
   client.on('startGame', function(game_id){
@@ -107,7 +107,8 @@ io.on('connection', (client) => {
   
   client.on('disconnect', () => {
     var ids = socketInfo[client.id]
-    client.to(ids.roomId).emit('userLeft', { userId: userId });
+    if (!ids) { return; }
+    io.to(ids.roomId).emit('userLeft', { userId: ids.userId });
     delete socketInfo[client.id];
   });
 
