@@ -6,7 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="icon" href="./assets/kazoo.png">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <style></style>
+  <style>
+
+  </style>
   <script></script>
   <script src="/socket.io/socket.io.js"></script>
 </head>
@@ -34,9 +36,11 @@
       <div class="col-6">
         <!-- USER INFO HERE -->
         <div class="form-group">
-          <!-- <label for="exampleInputEmail1">Display Name</label> -->
           <input type="text" class="form-control" id="displayName" placeholder="Display name">
           <small id="emailHelp" class="form-text text-muted">Between 3 and 20 characters</small>
+          <div id="errorBadUsername" style="margin-top: 15px; margin-bottom: 15px;">
+            <!-- ERROR BAD USERNAME -->
+          </div>
         </div>
         <div class="row" style="margin-bottom: 15px;">
           <div class="col-12">
@@ -49,6 +53,12 @@
           </div>
           <div class="col-6">
             <input type="text" class="form-control" placeholder="Room code">
+            <!-- <div id="errorNoRoomId" style="margin-top: 15px; margin-bottom: 15px;"> -->
+              <!-- ERROR NO ROOM ID -->
+            <!-- </div> -->
+            <strong id="errorNoRoomId" style="margin-right: 15px; color: red;">
+              <!-- ERROR SIGNING IN MESSAGE -->
+            </strong>
           </div>
         </div>
       </div>
@@ -67,47 +77,61 @@
 </script>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>
+  
+  var username = '<%=username%>';
+  var errorBadUsername = '<%=errorBadUsername%>';
+  var errorNoRoomId = '<%=errorNoRoomId%>';
+  var userId = '<%=userId%>';
+
   var socket = io()
-  const MIN_NAME_LENGTH = 3;
-  const MAX_NAME_LENGTH = 20;
-  const ERROR_BAD_LENGTH = `Username must be between ${MIN_NAME_LENGTH} and `
-                         + `${MAX_NAME_LENGTH} characters long.`;
 
-  const username = '<%=username%>';
+  // Socket
+  socket.on('roomCreated', (roomId) => {
+    console.log('room Created: ' + roomId);
+    const fakeForm = `
+      <form hidden id="fakeForm" action="/postCreateRoom" method="post">
+        <input name="username" value="${username}"></input>
+        <input name="userId" value="${userId}"></input>
+        <input name="roomId" value="${roomId}"></input>
+      </form>
+    `;
 
-  // USERNAME INFO
+    $('body').append(fakeForm);
+    $('#fakeForm').submit();
+  });
+
+  // CREATE ROOM
   $('button#createRoom').click(() => {
-
     const username = $('input#displayName').val();
-    if (!username || 
-        username.length < MIN_NAME_LENGTH || 
-        username.length > MAX_NAME_LENGTH) {
-      console.log(ERROR_BAD_LENGTH);
-    }
-
-    console.log('create room clicked');
-
+    console.log('createRoom');
     $.ajax({
       traditional: true,
       url: "/postUserInfo",
       type: 'POST',
-      data: {
-        username: username
-      },
-      success: function (data, textStatus, jqXHR) {
-        console.log("Posted new chat")
-        socket.emit("createRoom")
+      data: { username: username },
+      success: (data, textStatus, jqXHR) => {
+        if (textStatus == 'success') {
+          userId = data.userId;
+          console.log('success: ' + userId);
+          socket.emit('createRoom', {
+            username: username,
+            userId: userId,
+          });
+        } else {
+          const MIN_USERNAME_LENGTH = 3;
+          const MAX_USERNAME_LENGTH = 20;
+          const ERROR_BAD_USERNAME = 
+              `Username must be between ${MIN_USERNAME_LENGTH} and `
+            + `${MAX_USERNAME_LENGTH} characters long!`;
+          displayErrorMessages();
+        }
       }
     });
   });
 
+  // JOIN ROOM
   $('button#joinRoom').click(() => {
     const username = $('input#displayName').val();
-    if (!username || 
-        username.length < MIN_NAME_LENGTH || 
-        username.length > MAX_NAME_LENGTH) {
-      console.log(ERROR_BAD_LENGTH);
-    }
     console.log('join room clicked');
     $.ajax({
         traditional: true,
@@ -123,6 +147,16 @@
     });
   });
 
+  const postUserInfoFromInput = () => {
+    const username = $('input#displayName').val();
+    $.post(
+      '/postUserInfo',
+      { username: username },
+      () => { console.log('User info saved!'); }
+    );
+  }
+
+  // Maybe remove this -R
   const displayWelcome = () => {
     if (username) {
       $('#title').prepend(`<h1 class="display-3">Welcome ${username}!</h1>`);
@@ -131,14 +165,34 @@
     }
   };
 
+  // PRE-FILL USERNAME FIELD FROM SESSION
+  const populateUsernameField = () => {
+    $('input#displayName').val(username);
+  };
+
+  // DISPLAY ERRORS
+  const displayErrorMessages = () => {
+    if (errorBadUsername) { 
+      $('#errorBadUsername').html(`
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <!-- strong>Error signing in: </strong --><span>${errorSigningUp}</span>
+        </div>
+      `);
+    }
+
+    if (errorNoRoomId) {
+      $('#errorNoRoomId').html(errorNoRoomId);
+    }
+  };
+
   $(document).ready(() => {
     displayWelcome();
+    populateUsernameField();
+    displayErrorMessages();
   });
 
   $(function(){
-    socket.on('game_id',function(game_id){
-      window.location = "/lobby/" // TODO: Go to specific
-    });
+    
   })
 
   $(function(){

@@ -8,6 +8,7 @@
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="./css/style.css" />
+    <link rel="icon" href="./assets/kazoo.png">
     <title>KazooGuesser</title>
   </head>
   <body
@@ -45,8 +46,8 @@
           <h2>chat</h2>
         </div>
         <ul id="messages" style="list-style-type: none;"></ul>
-        <form class="text-entry" action="">
-          <input id="message_input" placeholder="enter your guess here" autocomplete="off"/>
+        <form class="text-entry" id="sendChat">
+          <input id="messageInput" placeholder="enter your guess here" autocomplete="off"/>
           <button>Send</button>
         </form>
       </div>
@@ -56,17 +57,51 @@
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
   <script>
 
-    $(function () {
-      var socket = io();
-      $("form").submit(function (e) {
-        e.preventDefault(); // prevents page reloading
-        socket.emit("chat message", $("#message_input").val());
-        $("#message_input").val("");
-        return false;
+    // Page state
+    const roomId = '<%=roomId%>';
+    const username = '<%=username%>';
+    const userId = '<%=userId%>';
+    const userInfo = {
+      username: username,
+      userId: userId,
+    };
+
+    // Socket setup
+    const socket = io();
+
+    socket.on('receive', (data) => {
+      console.log(data);
+      const chatText = `<b>${data.userInfo.username}</b>: ${data.message}`;
+      $("#messages").append($("<li>").html(chatText));
+    });
+
+    const setupSockets = () => {
+      socket.emit('joinRoom', {
+        userInfo: userInfo,
+        roomId: roomId,
       });
-      socket.on("chat message", function (msg) {
-        $("#messages").append($("<li>").text(msg));
+    };
+
+    $('form#sendChat').submit((e) => {
+      console.log('chat submitted');
+      e.preventDefault(); // Prevents page reloading
+      const message = $('#messageInput').val();
+      if (!message) { return; }
+      
+      // Send message to room
+      socket.emit('send', {
+        userInfo: userInfo,
+        roomId: roomId,
+        message: message,
       });
+
+      console.log({
+        userInfo: userInfo,
+        roomId: roomId,
+        message: message,
+      });
+
+      $('#messageInput').val('');
     });
 
     function sortByScore(a, b) {
@@ -114,5 +149,10 @@
       var song = document.getElementById("song");
       song.play();
     }
+
+    $('document').ready(() => {
+      setupSockets();
+    });
+
   </script>
 </html>
