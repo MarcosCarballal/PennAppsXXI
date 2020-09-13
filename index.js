@@ -8,6 +8,7 @@ const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const uuid = require('uuid');
 const async = require('async');
+const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 // ADD MIDDLEWARE
 app.use(express.static('public'));
@@ -51,7 +52,7 @@ const roomDeleter = setInterval(() => {
 // GAME CONSTANTS
 const ROUND_LENGTH =        35 * 1000; //  5 seconds
 const SHOW_SCORES_LENGTH =   5 * 1000; //  5 seconds
-const RAMP_UP_LENGTH =       5 * 1000; //  5 seconds
+const RAMP_UP_LENGTH =       1 * 1000; //  5 seconds
 const HINT_TIMER =          10 * 1000; // 10 seconds
 const NUM_ROUNDS =          10;
 
@@ -169,6 +170,46 @@ const getUserInfos = (roomId) => {
 //  GAME LOOP FUNCTIONS  //
 // ===================== //
 
+function getRandomSong() {
+  const herokuPrefix = 'https://cors-anywhere.herokuapp.com/';
+  const kazooSongsUrl = 'http://storage.googleapis.com/kazuub';
+
+  var songs = ["Africa",
+              "Ai_Se_Eu_Te_Pego",
+              "Baby",
+              "Bohemian_Rhapsody",
+              "Candyman",
+              "Don't_Start_Now",
+              "Fancy",
+              "HUMBLE",
+              "Never_Gonna_Give_You_Up",
+              "The_Sounds_of_Silence",
+              ];
+    var pickedSongNum = Math.floor(Math.random() * 10);
+    var pickedSong = songs[pickedSongNum];
+    var pickedSongUrl = herokuPrefix + kazooSongsUrl + "/" + pickedSong + ".mp3";
+    return {url: pickedSongUrl, name: pickedSong}; 
+
+  // var xhttp = new XMLHttpRequest();
+  // xhttp.onreadystatechange = function() {
+  //     if (this.readyState == 4 && this.status == 200) {
+  //         // var doc = this.responseXML;
+  //         // var songs = doc.getElementsByTagName("Contents");
+  //         // var pickedSongNum = Math.floor(Math.random() * 10);
+  //         // var pickedSong = songs[pickedSongNum];
+  //         // var pickedSongName = pickedSong.getElementsByTagName("Key")[0].childNodes[0].nodeValue;
+  //         // var pickedSongUrl = herokuPrefix + kazooSongsUrl + "/" + pickedSongName;
+
+  //         // return {url: pickedSongUrl, name: pickedSongName};
+  //     } else {
+  //       console.log("status: " + this.status + ", readyState: " + this.readyState);
+  //       console.log(this.responseXML);
+  //     }
+  // };
+  // xhttp.open("GET", kazooSongsUrl, true);
+  // xhttp.send();
+}
+
 const sleep = (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
@@ -189,16 +230,17 @@ const runGame = async (roomId) => {
   await sleep(RAMP_UP_LENGTH);
   
   while (roomInfo[roomId].currentRound <= NUM_ROUNDS) {
-    // TODO: get song id! and name!
-
-    var songName = "The Song Name".toLowerCase();
+    
+    var song = getRandomSong();
+    console.log(song);
+    var songName = song.name.toLowerCase();
     roomInfo[roomId].currentSongName = songName;
     roomInfo[roomId].currentSongHint = songName.replace(/[^a-z]+/g, "_");;
-
+    
     // TODO
-    songId = 'the song id';
+    var songUrl = song.url;
     io.to(roomId).emit('roundStart', { 
-      songId: songId, // client requests song info by id
+      songUrl: songUrl, // client requests song info by url
       roundLength: ROUND_LENGTH,
       roundNumber: roomInfo[roomId].currentRound,
     });
