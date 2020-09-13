@@ -29,17 +29,18 @@
         <div class="game-section-header">
           <h2>music</h2>
         </div>
-        <img
+        <!-- <img
           src="https://e7.pngegg.com/pngimages/439/430/png-clipart-musical-note-eighth-note-miscellaneous-music-symbols.png"
           alt=""
           width="400px"
           height="400px"
-        />
-        <audio
-          id="song"
-          src="https://cdns-preview-d.dzcdn.net/stream/c-deda7fa9316d9e9e880d2c6207e92260-8.mp3"
-        ></audio>
-        <input type="button" value="PLAY" onclick="playSong()" />
+        /> -->
+        <div 
+            width="400px"
+            height="400px"
+            id="audio-visualizer">
+        </div>
+        <input type="button" value="PAUSE" onclick="stopSong()" />
       </div>
       <div class="game-section container-fluid col-4" id="chat">
         <div class="game-section-header">
@@ -55,6 +56,10 @@
   </body>
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script defer src=https://cdn.JsDelivr.net/npm/p5></script>
+  <script defer src=https://cdn.JsDelivr.net/npm/p5/lib/addons/p5.dom.min.js></script>
+  <script defer src=https://cdn.JsDelivr.net/npm/p5/lib/addons/p5.sound.min.js></script>
+  <script src="../js/sketch.js"></script>
   <script>
 
     // Page state
@@ -149,13 +154,26 @@
       });
     };
 
+    // function playSong() {
+    //   var song = document.getElementById("song");
+    //   song.play();
+    // }
+
     function playSong() {
-      var song = document.getElementById("song");
-      song.play();
+        $.getScript("../js/sketch.js",function(){
+            playMusic('https://cdns-preview-7.dzcdn.net/stream/c-74f0f93e5e420487c4e322c12057dad9-3.mp3');
+        });
+    }
+
+    function stopSong() {
+        $.getScript("../js/sketch.js",function(){
+            stopMusic();
+        });
     }
 
     $('document').ready(() => {
-      setupSockets();
+        setupSockets();
+        playSong();
     });
 
   </script>
