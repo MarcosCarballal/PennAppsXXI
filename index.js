@@ -4,8 +4,8 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const port = process.env.PORT || 3000;
 const session = require('express-session');
-const bodyParser = require('body-parser')
-const cookieParser = require('cookie-parser')
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 
 // ADD MIDDLEWARE
 app.use(express.static('public'));
@@ -95,6 +95,10 @@ io.on('connection', function(socket){
   	console.log("socket with ID " + socket.id + " disconnected")
   	// emit to all players in room that the player disconnected.
   });
+  socket.on('game start', function() {
+    console.log('game started!');
+  });
+
 });
 
 //GAME LOOP
