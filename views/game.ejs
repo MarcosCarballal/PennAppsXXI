@@ -8,6 +8,7 @@
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="./css/style.css" />
+    <link rel="icon" href="./assets/kazoo.png">
     <title>KazooGuesser</title>
   </head>
   <body
@@ -45,8 +46,8 @@
           <h2>chat</h2>
         </div>
         <ul id="messages" style="list-style-type: none;"></ul>
-        <form class="text-entry" action="">
-          <input id="message_input" placeholder="enter your guess here" autocomplete="off"/>
+        <form class="text-entry" id="sendChat">
+          <input id="messageInput" placeholder="enter your guess here" autocomplete="off"/>
           <button>Send</button>
         </form>
       </div>
@@ -67,6 +68,11 @@
       socket.on("chat message", function (msg) {
         $("#messages").append($("<li>").text(msg));
       });
+    });
+
+    $('form#sendChat').submit(() => {
+      const message = $('#messageInput').val();
+
     });
 
     function sortByScore(a, b) {

@@ -37,10 +37,10 @@ const getAbout = (req, res) => {
 }
 
 const routes = {
-  getHome:      getHome,
-  getLobby:     getLobby,
-  getGame:      getGame,
-  getAbout:     getAbout,
+  getHome:  getHome,
+  getLobby: getLobby,
+  getGame:  getGame,
+  getAbout: getAbout,
 }
 
 module.exports = routes;

@@ -10,6 +10,7 @@
 
   </style>
   <script></script>
+  <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
   
@@ -69,19 +70,63 @@
   </div>
   
 </body>
+
+<script>
+
+
+</script>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>
+  
+  var socket = io()
 
   // CREATE ROOM
   $('button#createRoom').click(() => {
-    postUserInfoFromInput();
-    location.href = '/lobby';
+
+    const username = $('input#displayName').val();
+    if (!username || 
+        username.length < MIN_NAME_LENGTH || 
+        username.length > MAX_NAME_LENGTH) {
+      console.log(ERROR_BAD_LENGTH);
+    }
+
+    console.log('create room clicked');
+
+    $.ajax({
+      traditional: true,
+      url: "/postUserInfo",
+      type: 'POST',
+      data: {
+        username: username
+      },
+      success: function (data, textStatus, jqXHR) {
+        console.log("Posted new chat")
+        socket.emit("createRoom")
+      }
+    });
   });
 
   // JOIN ROOM
   $('button#joinRoom').click(() => {
-    postUserInfoFromInput();
-    $.get('/lobby');
+    const username = $('input#displayName').val();
+    if (!username || 
+        username.length < MIN_NAME_LENGTH || 
+        username.length > MAX_NAME_LENGTH) {
+      console.log(ERROR_BAD_LENGTH);
+    }
+    console.log('join room clicked');
+    $.ajax({
+        traditional: true,
+        url: "/postUserInfo",
+        type: 'POST',
+        data: {
+        username: username
+      },
+      success: function (data, textStatus, jqXHR) {
+        console.log("Posted new chat")
+        socket.emit("joinRoom")
+      }
+    });
   });
 
   const postUserInfoFromInput = () => {
@@ -130,6 +175,18 @@
     populateUsernameField();
     displayErrorMessages();
   });
+
+  $(function(){
+    socket.on('game_id',function(game_id){
+      window.location = "/lobby/" // TODO: Go to specific
+    });
+  })
+
+  $(function(){
+    socket.on('invalid_game_id',function(game_id){
+      window.location = "/blah/" // TODO: Fix
+    });
+  })  
 
 </script>
 </html>
