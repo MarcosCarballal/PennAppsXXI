@@ -76,8 +76,10 @@ io.on('connection', function(socket){
   	// }
   })
   socket.on('startGame', function(game_id){
-  	console.log("Staring the game with game_id:" + str(game_id))
-  	// Emit all players a link to game for the cleint to navigate to
+  	console.log("Starting the game with game_id:" + game_id);
+    // Emit all players a link to game for the cleint to navigate to
+    console.log(game_id);
+    socket.to(game_id).emit("gameStarted");
   	// Start the game loop
   	// while(maxscore < 10){
   	// 	asdasdl
@@ -94,9 +96,6 @@ io.on('connection', function(socket){
   socket.on('disconnect',function(){
   	console.log("socket with ID " + socket.id + " disconnected")
   	// emit to all players in room that the player disconnected.
-  });
-  socket.on('game start', function() {
-    console.log('game started!');
   });
 
 });

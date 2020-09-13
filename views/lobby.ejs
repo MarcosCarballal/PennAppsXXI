@@ -54,8 +54,8 @@
       { name: "efe"},
     ];
 
-  socket.on('playerJoined', function(player) {
-    players.append(player);
+  socket.on('playerJoined', function(newPlayers) {
+    players = newPlayers;
     renderPlayerCards();
   });
 
@@ -97,9 +97,8 @@
   });
 
   $('document').ready(() => {
-    // on page load
+    renderPlayerCards();
   });
 
-  renderPlayerCards();
 </script>
 </html>
