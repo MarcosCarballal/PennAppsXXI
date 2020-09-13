@@ -123,9 +123,11 @@ io.on('connection', (client) => {
     var userId = data.userInfo.userId;
     var roomId = data.roomId;
     var roomUserInfo = roomInfo[roomId].userInfos[userId];
-    if (data.message.toLowerCase().replace(',', '').replace('.', '') === roomInfo[roomId].currentSongName.replace(',', '').replace('.', '')) { // TODO export to equality function
+    if (roomInfo[roomId].currentSongName != null && 
+        !roomUserInfo.guessedCorrectly && 
+        data.message.toLowerCase().replace(',', '').replace('.', '') === roomInfo[roomId].currentSongName.replace(',', '').replace('.', '')) { // TODO export to equality function
       roomUserInfo.guessedCorrectly = true;
-      roomUserInfo.roundScore = ROUND_LENGTH - ((Date.now().getTime() - getroomInfo[roomId].lastRoundStartTime.getTime()) / seconds);
+      roomUserInfo.roundScore = ROUND_LENGTH - ((Date.now() - roomInfo[roomId].lastRoundStartTime) / 1000);
     }
     var guessedCorrectly = roomUserInfo.guessedCorrectly;
     io.to(data.roomId).emit('receive', {
