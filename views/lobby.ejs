@@ -45,26 +45,38 @@
 <script src="/socket.io/socket.io.js"></script>
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <script>
+  
+  var userInfos = [];
+  var username = '<%=username%>';
+  var userId = '<%=userId%>';
+  var roomId = '<%=roomId%>';
+  var userInfo = {
+    username: username,
+    userId: userId,
+  };
+
   const socket = io();
+  const setupSockets = () => {
+    console.log('setup sockets');
+    socket.emit('joinRoom', {
+      userInfo: userInfo,
+      roomId: roomId,
+    });
 
-  var players = [
-      { name: "mac"},
-      { name: "marcos"},
-      { name: "riley"},
-      { name: "efe"},
-    ];
+    const refreshPlayers = (data) => {
+      console.log('refreshPlayers');
+      userInfos = data;
+      console.log('userInfos: ' + userInfos);
+      renderPlayerCards();
+    }
 
-  socket.on('playerJoined', function(newPlayers) {
-    players = newPlayers;
-    renderPlayerCards();
-  });
-
-  socket.on('playerLeft', function(player) {
-
-  });
+    socket.on('userJoined', refreshPlayers);
+    socket.on('userLeft', refreshPlayers);
+  }
 
   function renderPlayerCards() {
-    players.forEach(player => {
+    $("#players").empty();
+    userInfos.forEach((userInfo) => {
       var playerCard = document.createElement("div");
       playerCard.className = "player-card";
 
@@ -73,7 +85,7 @@
       playerAvatar.src = "https://icon-library.com/images/male-avatar-icon/male-avatar-icon-14.jpg";
 
       var playerName = document.createElement("h3");
-      playerName.innerHTML = player.name;
+      playerName.innerHTML = userInfo.username;
       playerName.id = "player-name";
       playerCard.append(playerAvatar);
       playerCard.append(playerName);
@@ -97,6 +109,8 @@
   });
 
   $('document').ready(() => {
+    console.log('roomId: ' + roomId);
+    setupSockets();
     renderPlayerCards();
   });
 

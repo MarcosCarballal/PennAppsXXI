@@ -30,6 +30,13 @@ app.post('/postCreateRoom', postRoutes.postCreateRoom);
 // ROOM STATE
 roomIds = [];
 roomInfo = {};
+socketInfo = {};
+// userIds
+// userInfo
+// timeCreated
+// usersBySocketIds
+// ...
+// ...
 
 const ROOM_TTL = 3 * 60 * 60 * 1000;      // 3 hours
 const ROOM_DELETER_INTERVAL = 60 * 1000;  // 1 minute
@@ -47,7 +54,7 @@ io.on('connection', (client) => {
       timeCreated: Date.now(),
       hasStarted: false,
       userIds: [],
-      userScores: {},
+      userInfos: {},
     };
     roomInfo[id] = room;
     roomIds.push(id);
@@ -58,19 +65,30 @@ io.on('connection', (client) => {
   // data = { userInfo: {...}, roomId: ... }
   client.on('joinRoom', (data) => {
 
-    // Update room state; dont double users
-    // var room = roomInfo[data.roomId];
-    // var user = data.userInfo;
-    // room.userIds.push(user.id);
+    var roomId = data.roomId;
+    var newUserId = data.userInfo.userId;
+    var newUserInfo = data.userInfo;
+    newUserInfo['score'] = 0;
     
-    // todo
-    // const userId = data.userInfo.userId;
-    // if (!userIds.includes(userId)) { userIds.push(userId); }
-    // if (!userInfo[userId]) { userInfo[userId] = userInfo; }
-    // if (!userScores[userId]) { userScores[userId] = 0; }
+    var room = roomInfo[roomId];
 
-    // subscribe to the room
-    client.join(data.roomId);
+    // Update room state // CHECK IF USERNAME CHANGED TODO
+    if (!room.userIds.includes(newUserId)) { room.userIds.push(newUserId); }
+    if (!room.userInfos[newUserId]) { room.userInfos[newUserId] = newUserInfo; }
+    
+    socketInfo[client.id] = {
+      userId: newUserId,
+      roomId: roomId,
+    };
+
+    var userInfos = [];
+    roomInfo[roomId].userIds.forEach((id) => {
+      userInfos.push(roomInfo[roomId].userInfos[id]);
+    });
+
+    // Subscribe to the room and tell the others
+    client.join(roomId);
+    io.to(roomId).emit('userJoined', userInfos);
   });
 
   client.on('startGame', function(game_id){
@@ -88,7 +106,29 @@ io.on('connection', (client) => {
   });
   
   client.on('disconnect', () => {
-  	
+    var ids = socketInfo[client.id]
+    if (!ids) { return; }
+
+    // Remove user id from list
+    console.log('userIds: ' + roomInfo[ids.roomId].userIds);
+    // console.log('userIds: ' + type(roomInfo[ids.roomId].userIds));
+    
+    var tempUserIds = [];
+    roomInfo[ids.roomId].userIds.forEach((id) => {
+      if (id != ids.userId) {
+        tempUserIds.push(id);
+      }
+    });
+    roomInfo[ids.roomId].userIds = tempUserIds;
+
+    var userInfos = [];
+    console.log(roomInfo[ids.roomId]);
+    roomInfo[ids.roomId].userIds.forEach((id) => {
+        userInfos.push(roomInfo[ids.roomId].userInfos[id]);
+    });
+
+    io.to(ids.roomId).emit('userLeft', userInfos);
+    delete socketInfo[client.id];
   });
 
 });
