@@ -18,12 +18,11 @@
       <div class="col-md-12">
         <div class="jumbotron lobby-background">
           <h1 class="display-3">KAZUUB.IO LOBBY</h1>
-          <p class="lead">a music guessing game</p>
+          <p class="lead" id="game-id">a music guessing game</p>
           <hr class="my-2">
           <p>PENNAPPS XXI</p>
           <p class="lead">
             <button class="btn btn-lg" id="start-game">Start Game</button>
-            <!-- <a class="btn btn-primary btn-lg" role="button" id="start-game">Start Game</a> -->
           </p>
         </div>
         <ul id="players" style="list-style-type: none;"></ul>
@@ -114,6 +113,7 @@
   
   $('document').ready(() => {
     console.log('roomId: ' + roomId);
+    document.getElementById('game-id').innerHTML = "Game code: " + roomId;
     setupSockets();
     renderPlayerCards();
   });

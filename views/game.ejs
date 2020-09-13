@@ -27,19 +27,20 @@
       </div>
       <div class="game-section container-fluid col-4" id="music">
         <div class="game-section-header">
-          <h2>music</h2>
+          <h2 id="music-header">music</h2>
         </div>
-        <img
+        <!-- <img
           src="https://e7.pngegg.com/pngimages/439/430/png-clipart-musical-note-eighth-note-miscellaneous-music-symbols.png"
           alt=""
           width="400px"
           height="400px"
-        />
-        <audio
-          id="song"
-          src="https://cdns-preview-d.dzcdn.net/stream/c-deda7fa9316d9e9e880d2c6207e92260-8.mp3"
-        ></audio>
-        <input type="button" value="PLAY" onclick="playSong()" />
+        /> -->
+        <div 
+            width="400px"
+            height="400px"
+            id="audio-visualizer">
+        </div>
+        <!-- <input type="button" value="PAUSE" onclick="stopSong()" /> -->
       </div>
       <div class="game-section container-fluid col-4" id="chat">
         <div class="game-section-header">
@@ -47,14 +48,18 @@
         </div>
         <ul id="messages" style="list-style-type: none;"></ul>
         <form class="text-entry" id="sendChat">
-          <input id="messageInput" placeholder="enter your guess here" autocomplete="off"/>
-          <button>Send</button>
+          <input class="form-group" id="messageInput" placeholder="enter your guess here" autocomplete="off"/>
+          <button class="btn btn-success">Send</button>
         </form>
       </div>
     </div>
   </body>
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script defer src=https://cdn.JsDelivr.net/npm/p5></script>
+  <script defer src=https://cdn.JsDelivr.net/npm/p5/lib/addons/p5.dom.min.js></script>
+  <script defer src=https://cdn.JsDelivr.net/npm/p5/lib/addons/p5.sound.min.js></script>
+  <script src="../js/sketch.js"></script>
   <script>
 
     // Page state
@@ -66,6 +71,9 @@
       username: username,
       userId: userId,
     };
+
+    var secondsLeft;
+    var countdown;
 
     // Socket setup
     const socket = io();
@@ -91,17 +99,28 @@
       socket.on('userLeft', refreshPlayers);
       socket.on('roundStart', (data) => {
         console.log('roundStart socket called');
-        const songId = data.songId;
+        const songUrl = data.songUrl;
         const roundLength = data.roundLength;
         const roundNumber = data.roundNumber;
-        // TODO
+        console.log(songUrl);
+        playSong(songUrl);
+        secondsLeft = roundLength / 1000;
+        countdown = setInterval(() => {
+            secondsLeft -= 1;
+            var seconds = (secondsLeft >= 0) ? "| Seconds left: " + secondsLeft : "";
+            $("#music-header").text("Round " + roundNumber + seconds);
+        }, 1000);
       });
       socket.on('wordBlanks', (data) => {
         console.log('wordBlanks socket called');
         const songHint = data.songHint;
         // TODO
       });
-      socket.on('updateScores', (data) => refreshPlayers);
+      socket.on('updateScores', (data) => {
+        refreshPlayers(data);
+        clearInterval(countdown);
+        $("#music-header").text("Round " + roundNumber + " is over");
+      });
       socket.on('endGame', () => {
         console.log('endGame socket called');
         // TODO
@@ -166,13 +185,42 @@
       });
     };
 
-    function playSong() {
-      var song = document.getElementById("song");
-      song.play();
+    function playSong(url) {
+        $.getScript("../js/sketch.js",function(){
+            playMusic(url);
+        });
     }
 
+    function stopSong() {
+        $.getScript("../js/sketch.js",function(){
+            pauseMusic();
+        });
+    }
+
+    // function playRandomSong() {
+    //     const herokuPrefix = 'https://cors-anywhere.herokuapp.com/';
+    //     const kazooSongsUrl = 'http://storage.googleapis.com/kazuub';
+
+    //     var xhttp = new XMLHttpRequest();
+    //     xhttp.onreadystatechange = function() {
+    //         if (this.readyState == 4 && this.status == 200) {
+    //             var doc = this.responseXML;
+    //             var songs = doc.getElementsByTagName("Contents");
+    //             var pickedSongNum = Math.floor(Math.random() * 10);
+    //             var pickedSong = songs[pickedSongNum];
+    //             var pickedSongName = pickedSong.getElementsByTagName("Key")[0].childNodes[0].nodeValue;
+    //             var pickedSongUrl = herokuPrefix + kazooSongsUrl + "/" + pickedSongName;
+
+    //             playSong(pickedSongUrl);
+    //         }
+    //     };
+    //     xhttp.open("GET", herokuPrefix + kazooSongsUrl, true);
+    //     xhttp.send();
+    // }
+
     $('document').ready(() => {
-      setupSockets();
+        setupSockets();
+        // playRandomSong();
     });
 
   </script>

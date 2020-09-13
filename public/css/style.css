@@ -98,3 +98,19 @@
   color: white;
   border-radius: 20px;
 }
+
+#audio-visualizer {
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#start-game {
+  padding: 10px;
+  display: inline-flex;
+  align-self: center;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+}
