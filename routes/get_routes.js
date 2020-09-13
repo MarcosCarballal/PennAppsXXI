@@ -1,25 +1,41 @@
 
-const getChatTest = (req, res) => {
-  res.render('index.ejs', {});
-}
+const uuid = require('uuid');
 
 const getHome = (req, res) => {
-  var username = null;
-  if (req.session.username) {
-    username = req.session.username;
-  }
   res.render('home.ejs', {
-    username: username,
+    username: req.session.username || '',
+    userId: req.session.userId || null,
     errorBadUsername: null,
+    errorNoRoomId: null,
   });
 }
 
+const ERROR_NO_ROOM_ID = `No room code entered!`;
 const getLobby = (req, res) => {
-  res.render('lobby.ejs', {});
+  if (!req.session) {
+    return res.redirect('/home');
+  }
+  if (!req.body.roomId) {
+    return res.render('home.ejs', {
+      username: req.session.username,
+      userId: req.session.userId,
+      errorBadUsername: null,
+      errorNoRoomId: ERROR_NO_ROOM_ID,
+    });
+  }
+  res.render('lobby.ejs', {
+    username: username,
+    userId: userId,
+    roomId: roomId,
+  });
 }
 
 const getGame = (req, res) => {
-  res.render('game.ejs', {});
+  res.render('game.ejs', {
+    username: "Riley",
+    userId: "rileys_id",
+    roomId: "322",
+  });
 }
 
 const getAbout = (req, res) => {
@@ -27,11 +43,10 @@ const getAbout = (req, res) => {
 }
 
 const routes = {
-  getChatTest:  getChatTest,
-  getHome:      getHome,
-  getLobby:     getLobby,
-  getGame:      getGame,
-  getAbout:     getAbout,
+  getHome:  getHome,
+  getLobby: getLobby,
+  getGame:  getGame,
+  getAbout: getAbout,
 }
 
 module.exports = routes;

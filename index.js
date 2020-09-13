@@ -4,16 +4,15 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const port = process.env.PORT || 3000;
 const session = require('express-session');
-const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser')
+const cookieParser = require('cookie-parser')
+const uuid = require('uuid');
 
 // ADD MIDDLEWARE
 app.use(express.static('public'));
 app.use(session({ secret: 'kazoo' }));
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser()); //  Not sure if we need cookies
-
-playerDict = {}
+app.use(cookieParser());
 
 // CONFIGURE GET ROUTES
 const getRoutes = require('./routes/get_routes.js');
@@ -25,97 +24,74 @@ app.get('/about', getRoutes.getAbout);
 
 // CONFIGURE POST ROUTES
 const postRoutes = require('./routes/post_routes.js');
-app.post('/postUserInfo', postRoutes.postUserInfo);
+app.post('/postUserInfo',   postRoutes.postUserInfo);
+app.post('/postCreateRoom', postRoutes.postCreateRoom);
 
-// SOCKET 
+// ROOM STATE
+roomIds = [];
+roomInfo = {};
 
-currentSongTitle = ""
-roomCounter = 1
+const ROOM_TTL = 3 * 60 * 60 * 1000;      // 3 hours
+const ROOM_DELETER_INTERVAL = 60 * 1000;  // 1 minute
+const roomDeleter = setInterval(() => {
+  // todo, delete rooms from front of queue
+}, ROOM_DELETER_INTERVAL);
 
-
-io.on('connection', function(socket){
-	if(!playerDict[socket.id]){
-		playerDict[socket.id] = "Chad_" + socket.id
-	}
-
-
-  socket.on('createRoom', function(){
-   	// Make socket room/lobby
-  	// Add maker's socket to room
-  	// Send back Game ID
-  	// Emit back to client the page to navigate to
-  	game_id = roomCounter
-  	socket.join(game_id) // Creates room and joins maker's socket
-  	roomCounter = roomCounter + 1
-  	console.log("Created room with id " + game_id)
-  	console.log("Socket with id" + socket.id + " joined the room with ID " + game_id)
-  	console.log(io.sockets.adapter.rooms)
-  	console.log("Room keys vvvvvvvvvv")
-  	console.log(Object.keys(io.sockets.adapter.rooms))
-  	io.to(socket.id).emit('game_id',game_id)// respond only to sender
+// SOCKET HANDLERS
+io.on('connection', (client) => {
+  
+  client.on('createRoom', (userInfo) => {
+    const id = uuid.v4();
+    var room = {
+      id: id,
+      timeCreated: Date.now(),
+      hasStarted: false,
+      userIds: [],
+      userScores: {},
+    };
+    roomInfo[id] = room;
+    roomIds.push(id);
+    client.emit('roomCreated', id);
+    console.log(`Room [${id}] created by ${userInfo.username}`);
   });
-  socket.on('joinRoom', function(game_id){
-  	// Add socket to room
-  	// Emit back to client the page to navigate to
-  	// Bind the socket_id to the user registered under cookies.
-  	console.log(io.sockets.adapter.rooms)
-  	console.log("Room keys vvvvvvvvvv")
-  	console.log(Object.keys(io.sockets.adapter.rooms))
+  
+  // data = { userInfo: {...}, roomId: ... }
+  client.on('joinRoom', (data) => {
 
-    socket.join(game_id)
-		io.to(socket.id).emit('game_id', game_id)
-		console.log(io.sockets.adapter.rooms)
+    // Update room state; dont double users
+    // var room = roomInfo[data.roomId];
+    // var user = data.userInfo;
+    // room.userIds.push(user.id);
+    
+    // todo
+    // const userId = data.userInfo.userId;
+    // if (!userIds.includes(userId)) { userIds.push(userId); }
+    // if (!userInfo[userId]) { userInfo[userId] = userInfo; }
+    // if (!userScores[userId]) { userScores[userId] = 0; }
 
-  	// if (Object.keys(io.sockets.adapter.rooms).includes(game_id)){
-	  //   socket.join(game_id)
-			// io.to(socket.id).emit('game_id', game_id)
-			// console.log(io.sockets.adapter.rooms)
-  	// }
-  	// else{
-  	// 	io.to(socket.id).emit('invalid_game_id', true)  		
-  	// }
-  })
-  socket.on('startGame', function(game_id){
-  	console.log("Starting the game with game_id:" + game_id);
-    // Emit all players a link to game for the cleint to navigate to
-    console.log(game_id);
-    socket.to(game_id).emit("gameStarted");
-  	// Start the game loop
-  	// while(maxscore < 10){
-  	// 	asdasdl
-  	// 	asdased
-  	// 	currentSongTitle = "Shakira's song"
-  	// }
+    // subscribe to the room
+    client.join(data.roomId);
   });
-  socket.on('guess', function(guess){
-  	console.log("message:" + guess);
-  	// Determine the room that socker id belongs to.
-  	// Emit this value to the socket of all players
-    io.emit('annouceGuess', playerDict[socket.id] + " guessed:" + guess);
+
+  client.on('startGame', function(game_id){
+  	// todo, move from lobby to game
   });
-  socket.on('disconnect',function(){
-  	console.log("socket with ID " + socket.id + " disconnected")
-  	// emit to all players in room that the player disconnected.
+
+  // data = { roomId: ..., userInfo: {...}, message: ... }
+  client.on('send', (data) => {
+    // todo: check if correct
+    console.log(data);
+    io.to(data.roomId).emit('receive', {
+      userInfo: data.userInfo,
+      message: data.message,
+    });
+  });
+  
+  client.on('disconnect', () => {
+  	
   });
 
 });
 
-//GAME LOOP
-function startGame() {
-  const numRounds = 3;
-  var round = 0;
-  while (round < numRounds) {
-    //getSong();
-    //playSong();
-    //wait for players to answer or time to run out
-    //increment scores
-    round++;
-  }
-}
-
 http.listen(port);
 console.log(`Server running on port ${port}. Open http://localhost:${port}/ in browser!`);
-
-module.exports = {
-  io: io,
-};
