@@ -4,6 +4,7 @@ const uuid = require('uuid');
 const getHome = (req, res) => {
   res.render('home.ejs', {
     username: req.session.username || '',
+    userId: req.session.userId || null,
     errorBadUsername: null,
     errorNoRoomId: null,
   });
@@ -16,7 +17,8 @@ const getLobby = (req, res) => {
   }
   if (!req.body.roomId) {
     return res.render('home.ejs', {
-      username: null,
+      username: req.session.username,
+      userId: req.session.userId,
       errorBadUsername: null,
       errorNoRoomId: ERROR_NO_ROOM_ID,
     });

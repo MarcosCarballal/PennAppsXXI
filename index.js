@@ -24,8 +24,8 @@ app.get('/about', getRoutes.getAbout);
 
 // CONFIGURE POST ROUTES
 const postRoutes = require('./routes/post_routes.js');
-const { info } = require('console');
-app.post('/postUserInfo', postRoutes.postUserInfo);
+app.post('/postUserInfo',   postRoutes.postUserInfo);
+app.post('/postCreateRoom', postRoutes.postCreateRoom);
 
 // ROOM STATE
 roomIds = [];
@@ -41,7 +41,7 @@ const roomDeleter = setInterval(() => {
 io.on('connection', (client) => {
   
   client.on('createRoom', (userInfo) => {
-    const id = uuid();
+    const id = uuid.v4();
     var room = {
       id: id,
       timeCreated: Date.now(),
@@ -51,7 +51,7 @@ io.on('connection', (client) => {
     };
     roomInfo[id] = room;
     roomIds.push(id);
-    socket.emit(userInfo.userId, id);
+    client.emit('roomCreated', id);
     console.log(`Room [${id}] created by ${userInfo.username}`);
   });
   

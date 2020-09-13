@@ -1,4 +1,5 @@
 
+const uuid = require('uuid');
 
 // USERNAME CONSTANTS
 const MIN_USERNAME_LENGTH = 3;
@@ -12,24 +13,34 @@ const postUserInfo = (req, res) => {
   if (!req.body.username ||
       req.body.username.length < MIN_USERNAME_LENGTH ||
       req.body.username.length > MAX_USERNAME_LENGTH) {
-    return res.render('home.ejs', {
-      username: null,
-      errorBadUsername: ERROR_BAD_USERNAME,
-    });
+    return res.status(400).end();
   }
 
-  const username = req.body.username;
-  const userId = req.session.userId || uuid();
-  req.session = {
-    username: req.body.username,
-    id: userId,
-  };
+  const userId = req.session.userId || uuid.v4();
+  req.session.username = req.body.username;
+  req.session.userId = userId;
+  res.status(200).send({ userId: userId });
+}
 
-  res.status(200).end();
+const postCreateRoom = (req, res) => {
+  console.log('postCreateRoom');
+
+  console.log(req.session);
+  console.log(req.body);
+
+  if (!req.session || !req.body.roomId) {
+    return res.redirect('/home');
+  }
+  res.render('lobby.ejs', {
+    username: req.session.username,
+    userId: req.session.userId,
+    roomId: req.body.roomId,
+  });
 }
 
 const routes = {
-  postUserInfo: postUserInfo,
+  postUserInfo:   postUserInfo,
+  postCreateRoom: postCreateRoom,
 };
 
 module.exports = routes;

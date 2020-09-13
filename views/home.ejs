@@ -78,22 +78,53 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>
   
-  const username = '<%=username%>';
+  var username = '<%=username%>';
+  var errorBadUsername = '<%=errorBadUsername%>';
+  var errorNoRoomId = '<%=errorNoRoomId%>';
+  var userId = '<%=userId%>';
 
   var socket = io()
 
+  // Socket
+  socket.on('roomCreated', (roomId) => {
+    console.log('room Created: ' + roomId);
+    const fakeForm = `
+      <form hidden id="fakeForm" action="/postCreateRoom" method="post">
+        <input name="username" value="${username}"></input>
+        <input name="userId" value="${userId}"></input>
+        <input name="roomId" value="${roomId}"></input>
+      </form>
+    `;
+
+    $('body').append(fakeForm);
+    $('#fakeForm').submit();
+  });
+
   // CREATE ROOM
   $('button#createRoom').click(() => {
+    const username = $('input#displayName').val();
+    console.log('createRoom');
     $.ajax({
       traditional: true,
       url: "/postUserInfo",
       type: 'POST',
-      data: {
-        username: username
-      },
-      success: function (data, textStatus, jqXHR) {
-        console.log("Posted new chat")
-        socket.emit("createRoom")
+      data: { username: username },
+      success: (data, textStatus, jqXHR) => {
+        if (textStatus == 'success') {
+          userId = data.userId;
+          console.log('success: ' + userId);
+          socket.emit('createRoom', {
+            username: username,
+            userId: userId,
+          });
+        } else {
+          const MIN_USERNAME_LENGTH = 3;
+          const MAX_USERNAME_LENGTH = 20;
+          const ERROR_BAD_USERNAME = 
+              `Username must be between ${MIN_USERNAME_LENGTH} and `
+            + `${MAX_USERNAME_LENGTH} characters long!`;
+          displayErrorMessages();
+        }
       }
     });
   });
@@ -141,7 +172,6 @@
 
   // DISPLAY ERRORS
   const displayErrorMessages = () => {
-    const errorBadUsername = '<%=errorBadUsername%>';
     if (errorBadUsername) { 
       $('#errorBadUsername').html(`
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -150,7 +180,6 @@
       `);
     }
 
-    const errorNoRoomId = '<%=errorNoRoomId%>';
     if (errorNoRoomId) {
       $('#errorNoRoomId').html(errorNoRoomId);
     }
@@ -163,9 +192,7 @@
   });
 
   $(function(){
-    socket.on('game_id',function(game_id){
-      window.location = "/lobby/" // TODO: Go to specific
-    });
+    
   })
 
   $(function(){
