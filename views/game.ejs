@@ -159,21 +159,43 @@
     //   song.play();
     // }
 
-    function playSong() {
+    function playSong(url) {
         $.getScript("../js/sketch.js",function(){
-            playMusic('https://cdns-preview-7.dzcdn.net/stream/c-74f0f93e5e420487c4e322c12057dad9-3.mp3');
+            playMusic(url);
         });
     }
 
     function stopSong() {
         $.getScript("../js/sketch.js",function(){
-            stopMusic();
+            pauseMusic();
         });
+    }
+
+    function playRandomSong() {
+        // var url = 'https://cdns-preview-7.dzcdn.net/stream/c-74f0f93e5e420487c4e322c12057dad9-3.mp3';
+        const herokuPrefix = 'https://cors-anywhere.herokuapp.com/';
+        const kazooSongsUrl = 'http://storage.googleapis.com/kazuub';
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                var doc = this.responseXML;
+                var songs = doc.getElementsByTagName("Contents");
+                var pickedSongNum = Math.floor(Math.random() * 10);
+                var pickedSong = songs[pickedSongNum];
+                var pickedSongName = pickedSong.getElementsByTagName("Key")[0].childNodes[0].nodeValue;
+                var pickedSongUrl = herokuPrefix + kazooSongsUrl + "/" + pickedSongName;
+
+                playSong(pickedSongUrl);
+            }
+        };
+        xhttp.open("GET", herokuPrefix + kazooSongsUrl, true);
+        xhttp.send();
     }
 
     $('document').ready(() => {
         setupSockets();
-        playSong();
+        playRandomSong();
     });
 
   </script>

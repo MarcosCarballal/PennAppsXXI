@@ -23,11 +23,15 @@ var mic;
 var backCol;
 
 function playMusic(url) {
-  music = loadSound(url);
+    music = loadSound(url, callback);
 }
 
-function stopMusic() {
-    music.stop();
+const callback = () => {
+    music.play();
+}
+
+function pauseMusic() {
+    music.pause();
 }
 
 function setup() {
@@ -69,8 +73,6 @@ function setup() {
   
   mic = new p5.AudioIn();
   mic.connect(fft);
-  
-  music.play();
 }
 
 function draw() {
