@@ -24,7 +24,6 @@ const postUserInfo = (req, res) => {
 
 const postCreateRoom = (req, res) => {
   console.log('postCreateRoom');
-
   console.log(req.session);
   console.log(req.body);
 
@@ -38,9 +37,21 @@ const postCreateRoom = (req, res) => {
   });
 }
 
+const postStartGame = (req, res) => {
+  if (!req.session || !req.body.roomId) {
+    return res.redirect('/home');
+  }
+  res.render('game.ejs', {
+    username: req.session.username,
+    userId: req.session.userId,
+    roomId: req.body.roomId,
+  });
+}
+
 const routes = {
   postUserInfo:   postUserInfo,
   postCreateRoom: postCreateRoom,
+  postStartGame:  postStartGame,
 };
 
 module.exports = routes;

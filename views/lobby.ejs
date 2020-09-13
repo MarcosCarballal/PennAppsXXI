@@ -22,7 +22,7 @@
           <hr class="my-2">
           <p>PENNAPPS XXI</p>
           <p class="lead">
-            <button role="button" id="start-game">Start Game</button>
+            <button class="btn btn-lg" id="start-game">Start Game</button>
             <!-- <a class="btn btn-primary btn-lg" role="button" id="start-game">Start Game</a> -->
           </p>
         </div>
@@ -72,7 +72,26 @@
 
     socket.on('userJoined', refreshPlayers);
     socket.on('userLeft', refreshPlayers);
+    socket.on('gameStarted', function(game_id) {
+      startGame(username, userId, roomId);
+    });
   }
+
+  const startGame = (username, userId, roomId) => {
+    const fakeForm = `
+      <form hidden id="fakeForm" action="/postStartGame" method="post">
+        <input name="username" value="${username}"></input>
+        <input name="userId" value="${userId}"></input>
+        <input name="roomId" value="${roomId}"></input>
+      </form>
+    `;
+    $('body').append(fakeForm);
+    $('#fakeForm').submit();
+  };
+
+  $('#start-game').click(() => {
+    socket.emit('startGame', { roomId: roomId });
+  });
 
   function renderPlayerCards() {
     $("#players").empty();
@@ -92,22 +111,7 @@
       $("#players").append(playerCard);
     });
   }
-
-  $('#start-game').click(() => {
-    socket.emit('startGame');
-  });
-
-  socket.on('gameStarted', function(game_id) {
-    console.log('game started!');
-    $.ajax({
-      url: "/game",
-      data: { },
-      success: function(xmlHttp) {
-        window.location = "/game/" + game_id;
-      }
-    });
-  });
-
+  
   $('document').ready(() => {
     console.log('roomId: ' + roomId);
     document.getElementById('game-id').innerHTML = "Game code: " + roomId;

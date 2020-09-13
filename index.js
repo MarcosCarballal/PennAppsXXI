@@ -26,6 +26,7 @@ app.get('/about', getRoutes.getAbout);
 const postRoutes = require('./routes/post_routes.js');
 app.post('/postUserInfo',   postRoutes.postUserInfo);
 app.post('/postCreateRoom', postRoutes.postCreateRoom);
+app.post('/postStartGame',  postRoutes.postStartGame);
 
 // ROOM STATE
 roomIds = [];
@@ -70,9 +71,8 @@ io.on('connection', (client) => {
     var newUserInfo = data.userInfo;
     newUserInfo['score'] = 0;
     
-    var room = roomInfo[roomId];
-
     // Update room state // CHECK IF USERNAME CHANGED TODO
+    var room = roomInfo[roomId];
     if (!room.userIds.includes(newUserId)) { room.userIds.push(newUserId); }
     if (!room.userInfos[newUserId]) { room.userInfos[newUserId] = newUserInfo; }
     
@@ -91,8 +91,12 @@ io.on('connection', (client) => {
     io.to(roomId).emit('userJoined', userInfos);
   });
 
-  client.on('startGame', function(game_id){
-  	// todo, move from lobby to game
+  client.on('startGame', (data) => {
+    const roomId = data.roomId;
+    console.log('roomId: ' + roomId);
+    console.log(roomInfo[roomId]);
+    roomInfo[roomId].hasStarted = true;
+    io.to(roomId).emit('gameStarted', {});
   });
 
   // data = { roomId: ..., userInfo: {...}, message: ... }
@@ -108,10 +112,6 @@ io.on('connection', (client) => {
   client.on('disconnect', () => {
     var ids = socketInfo[client.id]
     if (!ids) { return; }
-
-    // Remove user id from list
-    console.log('userIds: ' + roomInfo[ids.roomId].userIds);
-    // console.log('userIds: ' + type(roomInfo[ids.roomId].userIds));
     
     var tempUserIds = [];
     roomInfo[ids.roomId].userIds.forEach((id) => {

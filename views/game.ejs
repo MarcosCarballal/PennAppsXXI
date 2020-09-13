@@ -58,10 +58,11 @@
   <script>
 
     // Page state
-    const roomId = '<%=roomId%>';
-    const username = '<%=username%>';
-    const userId = '<%=userId%>';
-    const userInfo = {
+    var userInfos = [];
+    var roomId = '<%=roomId%>';
+    var username = '<%=username%>';
+    var userId = '<%=userId%>';
+    var userInfo = {
       username: username,
       userId: userId,
     };
@@ -80,6 +81,14 @@
         userInfo: userInfo,
         roomId: roomId,
       });
+      const refreshPlayers = (data) => {
+        console.log('refreshPlayers');
+        userInfos = data;
+        console.log('userInfos: ' + userInfos);
+        renderPlayerCards();
+      }
+      socket.on('userJoined', refreshPlayers);
+      socket.on('userLeft', refreshPlayers);
     };
 
     $('form#sendChat').submit((e) => {
@@ -114,16 +123,10 @@
       }
     }
 
-    var players = [
-      { name: "mac", score: 10},
-      { name: "marcos", score: 7 },
-      { name: "riley", score: 4 },
-      { name: "efe", score: 12 },
-    ];
-
-    players.sort(sortByScore);
-    var playerList = document.getElementById("playerList");
-    players.forEach(player => {
+    function renderPlayerCards() {
+      $('#playerList').empty();
+      userInfos.sort(sortByScore);
+      userInfos.forEach(userInfo => {
         var playerCard = document.createElement("div");
         playerCard.className = "player-card";
 
@@ -132,18 +135,19 @@
         playerAvatar.src = "https://icon-library.com/images/male-avatar-icon/male-avatar-icon-14.jpg";
 
         var playerName = document.createElement("h3");
-        playerName.innerHTML = player.name;
+        playerName.innerHTML = userInfo.username;
         playerName.id = "player-name";
 
         var playerScore = document.createElement("h3");
-        playerScore.innerHTML = player.score;
+        playerScore.innerHTML = userInfo.score;
         playerScore.id = "player-score";
 
         playerCard.appendChild(playerAvatar);
         playerCard.appendChild(playerName);
         playerCard.appendChild(playerScore);
         playerList.appendChild(playerCard);
-    });
+      });
+    };
 
     function playSong() {
       var song = document.getElementById("song");
